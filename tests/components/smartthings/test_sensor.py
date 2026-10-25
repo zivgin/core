@@ -16,6 +16,7 @@ from homeassistant.components.smartthings.const import DOMAIN, MAIN
 from homeassistant.components.smartthings.sensor import (
     SmartThingsSensor,
     SmartThingsSensorEntityDescription,
+    _dryer_cycle_name,
     _normalize_cycle_value,
 )
 from homeassistant.const import STATE_UNAVAILABLE, STATE_UNKNOWN, Platform
@@ -562,6 +563,16 @@ def test_normalize_cycle_value() -> None:
     assert _normalize_cycle_value("NORMAL_CYCLE") == "cycle"
     assert _normalize_cycle_value("washer_delicate") == "delicate"
     assert _normalize_cycle_value("delicate") == "delicate"
+
+
+def test_dryer_cycle_name() -> None:
+    """Test dryer cycle codes are only named within their reference table."""
+    assert _dryer_cycle_name("Table_03_Course_16") == "cotton"
+    assert _dryer_cycle_name("Table_03_Course_1F") == "mixed_load"
+    assert _dryer_cycle_name("Table_03_Course_99") is None
+    assert _dryer_cycle_name("Table_00_Course_16") is None
+    assert _dryer_cycle_name("16") is None
+    assert _dryer_cycle_name(None) is None
 
 
 def test_sensor_options_and_fallback() -> None:

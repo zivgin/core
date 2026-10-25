@@ -508,26 +508,32 @@
       "dryer_cycle": {
         "name": "Dryer cycle",
         "state": {
-          "1a": "Wool",
-          "1b": "Bedding",
-          "1c": "Shirts",
-          "1d": "Towels",
-          "1e": "Outdoor",
-          "1f": "Mixed Load",
-          "4c": "Air Refresh",
-          "4e": "Self Dry",
-          "16": "Cotton",
-          "17": "Super Speed",
-          "18": "Synthetics",
-          "19": "Delicates",
-          "20": "Iron Dry",
-          "21": "Hygiene Care",
-          "23": "Quick Dry 35'",
-          "24": "Cool Air",
-          "25": "Warm Air",
-          "27": "Time Dry",
-          "51": "Eco Cotton",
-          "53": "AI Dry+"
+          "ai_dry_plus": "AI Dry+",
+          "air_refresh": "Air Refresh",
+          "air_wash": "Air Wash",
+          "bedding": "Bedding",
+          "cool_air": "Cool Air",
+          "cotton": "Cotton",
+          "delicates": "Delicates",
+          "eco_cotton": "Eco Cotton",
+          "hygiene_care": "Hygiene Care",
+          "iron_dry": "Iron Dry",
+          "mixed_load": "Mixed Load",
+          "outdoor": "Outdoor",
+          "quick_dry_35": "Quick Dry 35'",
+          "self_dry": "Self Dry",
+          "shirts": "Shirts",
+          "super_speed": "Super Speed",
+          "synthetics": "Synthetics",
+          "time_dry": "Time Dry",
+          "towels": "Towels",
+          "warm_air": "Warm Air",
+          "wool": "Wool"
+        },
+        "state_attributes": {
+          "raw_cycle": {
+            "name": "Raw cycle"
+          }
         }
       },
       "dryer_job_state": {

@@ -3,6 +3,7 @@
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from datetime import datetime
+import re
 from typing import Any, cast, override
 
 from pysmartthings import (
@@ -187,28 +188,37 @@ WASHER_CYCLES = [
     "28",
 ]
 
-DRYER_CYCLES = [
-    "51",
-    "53",
-    "23",
-    "16",
-    "17",
-    "1f",
-    "18",
-    "19",
-    "1d",
-    "1b",
-    "1c",
-    "21",
-    "1a",
-    "1e",
-    "20",
-    "27",
-    "25",
-    "24",
-    "4e",
-    "4c",
-]
+# Samsung numbers dryer cycles per reference table, so a course code only has
+# a meaning together with its table (dryerCycle reports "Table_03_Course_16").
+# Codes in tables we have not verified are reported as unknown rather than
+# guessing a name from another table.
+DRYER_CYCLE_NAMES: dict[str, dict[str, str]] = {
+    "table_03": {
+        "16": "cotton",
+        "17": "super_speed",
+        "18": "synthetics",
+        "19": "delicates",
+        "1a": "wool",
+        "1b": "bedding",
+        "1c": "shirts",
+        "1d": "towels",
+        "1e": "outdoor",
+        "1f": "mixed_load",
+        "20": "iron_dry",
+        "21": "hygiene_care",
+        "23": "quick_dry_35",
+        "24": "cool_air",
+        "25": "warm_air",
+        "26": "air_wash",
+        "27": "time_dry",
+        "4c": "air_refresh",
+        "4e": "self_dry",
+        "51": "eco_cotton",
+        "53": "ai_dry_plus",
+    },
+}
+DRYER_CYCLES = sorted({name for t in DRYER_CYCLE_NAMES.values() for name in t.values()})
+DRYER_CYCLE_PATTERN = re.compile(r"^(table_[0-9a-f]+)_course_([0-9a-f]+)$")
 
 APPLIANCE_IDLE_OPERATING_STATES = {"ready", "stop"}
 APPLIANCE_FINISHED_JOB_STATES = {"finish", "finished"}
@@ -250,6 +260,16 @@ def power_attributes(status: dict[str, Any]) -> dict[str, Any]:
         if (value := status.get(attribute)) is not None:
             state[f"power_consumption_{attribute}"] = value
     return state
+
+
+def _dryer_cycle_name(value: Any) -> str | None:
+    """Return the program name for a table scoped dryer cycle code."""
+    if not isinstance(value, str) or not (
+        match := DRYER_CYCLE_PATTERN.match(value.lower())
+    ):
+        return None
+    table, code = match.groups()
+    return DRYER_CYCLE_NAMES.get(table, {}).get(code)
 
 
 def _normalize_cycle_value(value: Any) -> str | None:
@@ -1409,9 +1429,9 @@ CAPABILITY_TO_SENSORS: dict[
                 translation_key="dryer_cycle",
                 icon="mdi:tumble-dryer",
                 options=DRYER_CYCLES,
-                options_attribute=Attribute.SUPPORTED_CYCLES,
                 device_class=SensorDeviceClass.ENUM,
-                value_fn=_normalize_cycle_value,
+                value_fn=_dryer_cycle_name,
+                extra_state_attributes_fn=lambda value: {"raw_cycle": value},
             )
         ]
     },
